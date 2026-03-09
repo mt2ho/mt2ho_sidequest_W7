@@ -7,14 +7,13 @@
 // - Emit gameplay events (attack window, damaged, died, etc.)
 //
 // Non-goals:
-// - Does NOT own sprites (PlayerEntity owns sprites
+// - Does NOT own sprites (PlayerEntity owns sprites)
 // - Does NOT own camera/HUD (VIEW)
 
 export class PlayerController {
   constructor(playerEntity, opts = {}) {
     this.player = playerEntity;
     this.events = opts.events || null;
-    this.assets = opts.assets || null;
   }
 
   // handy passthrough for old code that expects playerCtrl.sprite
@@ -42,10 +41,7 @@ export class PlayerController {
     if (!p.dead && p.pendingDeath && grounded) {
       p.dead = true;
       p.pendingDeath = false;
-      this.events?.emit("player:died", {
-        health: p.health,
-        maxHealth: p.maxHealth,
-      });
+      this.events?.emit("player:died", { health: p.health, maxHealth: p.maxHealth });
     }
 
     // if dead or won, freeze horizontal control and just animate
@@ -60,22 +56,9 @@ export class PlayerController {
     // ATTACK start
     // -----------------------
     const wantAttack = input?.attackPressed;
-    if (
-      p.knockTimer === 0 &&
-      !p.pendingDeath &&
-      grounded &&
-      !p.attacking &&
-      wantAttack
-    ) {
+    if (p.knockTimer === 0 && !p.pendingDeath && grounded && !p.attacking && wantAttack) {
       p.startAttack();
       this.events?.emit("player:attacked", {});
-
-      // Play swing sound
-      const s = this.assets?.sounds?.swing;
-      if (s) {
-        s.currentTime = 0; // restart sound if it's still playing
-        s.play().catch(() => {}); // prevent browser errors
-      }
     }
 
     // -----------------------
@@ -85,14 +68,8 @@ export class PlayerController {
     if (p.knockTimer === 0 && !p.pendingDeath && grounded && wantJump) {
       p.jump();
       this.events?.emit("player:jumped", {});
-
-      // Play jump sound
-      const s = this.assets?.sounds?.jump;
-      if (s) {
-        s.currentTime = 0;
-        s.play();
-      }
     }
+
     // -----------------------
     // MOVE
     // -----------------------
@@ -147,12 +124,6 @@ export class PlayerController {
         maxHealth: p.maxHealth,
         sourceX,
       });
-      // Play damage sound
-      const s = this.assets?.sounds?.receiveDamage;
-      if (s) {
-        s.currentTime = 0;
-        s.play();
-      }
     }
     return didDamage;
   }

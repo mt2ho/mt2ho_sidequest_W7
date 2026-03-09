@@ -37,10 +37,7 @@ import { LevelLoader } from "./src/LevelLoader.js";
 import { Game } from "./src/Game.js";
 import { ParallaxBackground } from "./src/ParallaxBackground.js";
 import { loadAssets } from "./src/AssetLoader.js";
-import {
-  applyIntegerScale,
-  installResizeHandler,
-} from "./src/utils/IntegerScale.js";
+import { applyIntegerScale, installResizeHandler } from "./src/utils/IntegerScale.js";
 
 import { CameraController } from "./src/CameraController.js";
 import { InputManager } from "./src/InputManager.js";
@@ -211,22 +208,6 @@ function initRuntime() {
 
   // VIEW: parallax background renderer
   parallax = new ParallaxBackground(parallaxLayers);
-
-  // --- PLAY MUSIC HERE ---
-  const bgm = assets.sounds?.music;
-  if (bgm) {
-    bgm.loop = true; // loop indefinitely
-    bgm.volume = 0.4; // adjust volume
-    // To handle browser autoplay rules:
-    document.addEventListener(
-      "keydown",
-      () => {
-        if (bgm.paused)
-          bgm.play().catch((err) => console.warn("Autoplay blocked:", err));
-      },
-      { once: true },
-    );
-  }
 
   loop();
 }

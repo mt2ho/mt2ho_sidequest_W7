@@ -179,7 +179,7 @@ export class BoarController {
       return;
     }
 
-    e.knockTimer = this.KNOCK_FRAMES * 4;
+    e.knockTimer = this.KNOCK_FRAMES;
     e.vel.x = facingDir * this.KNOCK_X;
     e.vel.y = -this.KNOCK_Y;
 
@@ -290,21 +290,12 @@ export class BoarController {
 
     // probe-based turning rules
     const noGroundAhead = !this._frontHasGround(e);
-    const frontHitsLeaf = this.leaf
-      ? e.frontProbe.overlapping(this.leaf)
-      : false;
-    const frontHitsFire = this.fire
-      ? e.frontProbe.overlapping(this.fire)
-      : false;
+    const frontHitsLeaf = this.leaf ? e.frontProbe.overlapping(this.leaf) : false;
+    const frontHitsFire = this.fire ? e.frontProbe.overlapping(this.fire) : false;
     const frontHitsWall = this._frontHitsWall(e);
     const headSeesFire = this.fire ? e.footProbe.overlapping(this.fire) : false;
 
-    const dangerNow =
-      noGroundAhead ||
-      frontHitsLeaf ||
-      frontHitsFire ||
-      frontHitsWall ||
-      headSeesFire;
+    const dangerNow = noGroundAhead || frontHitsLeaf || frontHitsFire || frontHitsWall || headSeesFire;
 
     if (e.turnTimer === 0 && this._shouldTurnNow(e, dangerNow)) {
       this._turn(e, -e.dir);

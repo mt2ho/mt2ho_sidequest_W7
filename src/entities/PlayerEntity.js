@@ -25,10 +25,6 @@ export class PlayerEntity {
     this.sprite = null;
     this.sensor = null;
 
-    // simple visual effect
-    this.trailTimer = 0; // frames left to draw trail
-    this.trailPositions = []; // store recent positions
-
     // spawn
     const ps = this.levelData.playerStart || {
       x: this.tilesCfg.frameW ?? 32,
@@ -191,20 +187,12 @@ export class PlayerEntity {
     return false;
   }
 
+  // -----------------------
   // timers
+  // -----------------------
   tickTimers() {
     if (this.invulnTimer > 0) this.invulnTimer--;
     if (this.knockTimer > 0) this.knockTimer--;
-    // update trail positions
-    // -----------------------
-    this.trailTimer++;
-    if (this.trailTimer % 2 === 0) {
-      // every 2 frames
-      // store the current position
-      this.trailPositions.push({ x: this.sprite.x, y: this.sprite.y });
-      // keep last 6 positions max
-      if (this.trailPositions.length > 6) this.trailPositions.shift();
-    }
   }
 
   // -----------------------
@@ -234,7 +222,6 @@ export class PlayerEntity {
     this.attackFrameCounter = 0;
     this.stopX();
     this._playAni("attack", 0);
-    this.slashTimer = 6;
   }
 
   markAttackHit() {
@@ -251,8 +238,7 @@ export class PlayerEntity {
   // animation (visual state)
   // -----------------------
   applyAnimation({ grounded, won }) {
-    if (!this.sprite?.anis || Object.keys(this.sprite.anis).length === 0)
-      return;
+    if (!this.sprite?.anis || Object.keys(this.sprite.anis).length === 0) return;
 
     // ---- DEAD: play once, then hold last frame (prevents infinite loop)
     if (this.dead) {
@@ -324,8 +310,7 @@ export class PlayerEntity {
     if (!this.sprite) return;
 
     if (!this.dead && this.invulnTimer > 0) {
-      this.sprite.tint =
-        Math.floor(this.invulnTimer / 4) % 2 === 0 ? "#ff5050" : "#ffffff";
+      this.sprite.tint = Math.floor(this.invulnTimer / 4) % 2 === 0 ? "#ff5050" : "#ffffff";
     } else {
       this.sprite.tint = "#ffffff";
     }
