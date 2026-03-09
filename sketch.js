@@ -30,6 +30,14 @@ let playerImg;
 let trailPositions = [];
 let trailTimer = 0;
 
+// --- SOUND EFFECTS ---
+let jump;
+let leafCollect;
+let hitEnemy;
+let receiveDamage;
+let swing;
+let music;
+
 let playerAnis = {
   idle: { row: 0, frames: 4, frameDelay: 10 },
   run: { row: 1, frames: 4, frameDelay: 3 },
@@ -220,6 +228,14 @@ function preload() {
   wallRImg = loadImage("assets/wallR.png");
 
   fontImg = loadImage("assets/bitmapFont.png");
+
+  // --- LOAD SOUND EFFECTS ---
+  jump = loadSound("assets/sfx/jump.wav");
+  leafCollect = loadSound("assets/sfx/leafCollect.wav");
+  hitEnemy = loadSound("assets/sfx/hitEnemy.wav");
+  receiveDamage = loadSound("assets/sfx/receiveDamage.wav");
+  swing = loadSound("assets/sfx/swing.mp3");
+  music = loadSound("assets/sfx/music.wav");
 }
 
 function setup() {
@@ -291,6 +307,7 @@ function draw() {
     !attacking &&
     kb.presses("space")
   ) {
+    attackHitThisSwing = false;
     attacking = true;
     attackHitThisSwing = false;
     attackFrameCounter = 0;
@@ -298,6 +315,8 @@ function draw() {
     player.ani.frame = 0;
     player.ani = "attack";
     player.ani.play();
+    // --- PLAY SWING SOUND --//
+    if (swing) swing.play();
   }
 
   // JUMP
@@ -310,6 +329,8 @@ function draw() {
     kb.presses("up")
   ) {
     player.vel.y = -1 * PLAYER_JUMP;
+
+    if (jump) jump.play();
   }
 
   // --- PLAYER STATE / ANIMATION ---
@@ -597,7 +618,7 @@ function rescueLeaf(player, leaf) {
   leaf.visible = false;
   leaf.removeColliders();
   score++;
-
+  if (leafCollect) leafCollect.play();
   // win condition
   if (score >= WIN_SCORE) {
     won = true;
@@ -612,6 +633,8 @@ function takeDamageFromFire(player, fire) {
   if (invulnTimer > 0 || dead) return;
 
   health = max(0, health - 1);
+  if (receiveDamage) receiveDamage.play();
+
   if (health <= 0) pendingDeath = true;
 
   invulnTimer = INVULN_FRAMES;
@@ -631,6 +654,8 @@ function playerHitByBoar(player, e) {
   if (invulnTimer > 0 || dead) return;
 
   health = max(0, health - 1);
+
+  if (receiveDamage) receiveDamage.play();
   if (health <= 0) pendingDeath = true;
 
   invulnTimer = INVULN_FRAMES;
@@ -725,6 +750,8 @@ function hookBoarSolids() {
 
 function damageBoar(e, facingDir) {
   if (e.dead || e.dying) return;
+
+  if (hitEnemy) hitEnemy.play();
 
   e.hp = max(0, e.hp - 1);
   e.flashTimer = BOAR_FLASH_FRAMES;
@@ -1311,4 +1338,13 @@ function makeWorld() {
     { img: bgMidImg, speed: 0.4 },
     { img: bgForeImg, speed: 0.6 },
   ];
+}
+
+function keyPressed() {
+  userStartAudio();
+
+  if (music && !music.isPlaying()) {
+    music.setVolume(0.4);
+    music.loop();
+  }
 }
