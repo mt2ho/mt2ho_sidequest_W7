@@ -123,19 +123,19 @@ let deathFrameTimer = 0;
       = empty (no sprite)
 */
 let level = [
-  "                    g   g   b           ", // row  0
-  "                b             LggR      ", // row  1
-  "      x         LggR                    ", // row  2
-  "     LR   LgR          LR               ", // row  3
-  "   x  b        x   b  x                   ", // row  4, candy & enemies on platforms
-  "   LgggR       LR   LgR        b        ", // row  5, spaced platforms
-  "         LgR            ggg   LggggR    ", // row  6, candy on platform
-  "             LgR                    x   ", // row  7
-  " LgR      b                         LggR", // row  8
+  "                    g   g   b    x       ", // row  0 (2)
+  "                b             LggR      ", // row  1 (2)
+  "      x     x    LggR    x                ", // row  2
+  "     LR   LgR          LR               ", // row  3 (1)
+  "   x  b        x   b  x                 ", // row  4
+  "   LgggR       LR   LgR  x      b        ", // row  5 (3)
+  "         LgR            ggg   LggggR    ", // row  6 (3)
+  "  x           LgR                    x   ", // row  7
+  " LgR      b                  x       LggR", // row  8 (1)
   "         LgR        x       LR  LgR     ", // row  9
-  "   x     [d]       LggR            [dd]", // row 10
-  "LgggRLggggggR      Lgggg] dd     Lgggggggg", // row 11, large ground platforms
-  "dddddddddddddddddddddddddddddddddddddddd", // row 12, solid ground
+  "   x     [d]       LggR            [dd]", // row 10 (2)
+  "LgggRLggggggR      Lgggg] dd     Lgggggggg", // row 11 (1)
+  "dddddddddddddddddddddddddddddddddddddddd", // row 12
 ];
 
 // --- LEVEL CONSTANTS ---
