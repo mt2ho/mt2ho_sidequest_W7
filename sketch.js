@@ -42,9 +42,9 @@ let playerAnis = {
   idle: { row: 0, frames: 4, frameDelay: 10 },
   run: { row: 1, frames: 4, frameDelay: 3 },
   jump: { row: 2, frames: 3, frameDelay: Infinity, frame: 0 },
-  attack: { row: 3, frames: 6, frameDelay: 2 },
-  hurtPose: { row: 5, frames: 4, frameDelay: Infinity },
-  death: { row: 5, frames: 4, frameDelay: 16 },
+  attack: { row: 3, frames: 2, frameDelay: 7 },
+  hurtPose: { row: 3, frames: 2, frameDelay: 6 },
+  death: { row: 4.2, frames: 3, frameDelay: 12 },
 };
 
 let boar;
@@ -52,9 +52,9 @@ let boarImg;
 let boarSpawns = [];
 
 let boarAnis = {
-  run: { row: 1, frames: 4, frameDelay: 3 },
-  throwPose: { row: 4, frames: 1, frameDelay: Infinity, frame: 0 },
-  death: { row: 5, frames: 4, frameDelay: 16 },
+  run: { row: 1, frames: 3, frameDelay: 10 },
+  throwPose: { row: 2.5, frames: 2, frameDelay: Infinity, frame: 0 },
+  death: { row: 2.3, frames: 3, frameDelay: 12 },
 };
 
 let attacking = false;
@@ -78,7 +78,13 @@ let groundTileImg,
   wallRImg;
 
 let bgLayers = [];
-let bgForeImg, bgMidImg, bgFarImg;
+let bgForeImg,
+  bgMidImg,
+  bgFarImg,
+  bgSkyImg,
+  bgSkybackImg,
+  bgYellowImg,
+  bgMountainImg;
 
 let leaf;
 let leafImg;
@@ -117,19 +123,19 @@ let deathFrameTimer = 0;
       = empty (no sprite)
 */
 let level = [
-  "                    g   g   b  x        ", // row  0
-  "                b x         LggR        ", // row  1
-  "      x   f     LggR                    ", // row  2
+  "                    g   g   b           ", // row  0
+  "                b             LggR      ", // row  1
+  "      x         LggR                    ", // row  2
   "     LR   LgR          LR               ", // row  3
-  "   fx  b        x   b                   ", // row  4
-  "   LgggR   x   LR   LgR x   b  xf       ", // row  5
-  "         LgR  b x       g   LggggR      ", // row  6
-  " fx           LgR                    fx ", // row  7
+  "   x  b        x   b  x                   ", // row  4, candy & enemies on platforms
+  "   LgggR       LR   LgR        b        ", // row  5, spaced platforms
+  "         LgR            ggg   LggggR    ", // row  6, candy on platform
+  "             LgR                    x   ", // row  7
   " LgR      b                         LggR", // row  8
-  "         LgR        f x    LR  LgR  [dd]", // row  9
-  "   x     [d]      x LggR   x    ff  [dd]", // row 10
-  "LgggRffLggggggRfffLgggg]fffgfLgggggggggg", // row 11
-  "dddddddddddddddddddddddddddddddddddddddd", // row 12
+  "         LgR        x       LR  LgR     ", // row  9
+  "   x     [d]       LggR            [dd]", // row 10
+  "LgggRLggggggR      Lgggg]      Lgggggggg", // row 11, large ground platforms
+  "dddddddddddddddddddddddddddddddddddddddd", // row 12, solid ground
 ];
 
 // --- LEVEL CONSTANTS ---
@@ -211,14 +217,18 @@ function tileAtWorld(x, y) {
 }
 
 function preload() {
-  playerImg = loadImage("assets/foxSpriteSheet.png");
-  boarImg = loadImage("assets/boarSpriteSheet.png");
-  leafImg = loadImage("assets/leafSpriteSheet.png");
+  playerImg = loadImage("assets/catSpriteSheet.png");
+  boarImg = loadImage("assets/monsterSpriteSheet.png");
+  leafImg = loadImage("assets/candySpriteSheet.png");
   fireImg = loadImage("assets/fireSpriteSheet.png");
 
   bgFarImg = loadImage("assets/background_layer_1.png");
   bgMidImg = loadImage("assets/background_layer_2.png");
   bgForeImg = loadImage("assets/background_layer_3.png");
+  bgSkyImg = loadImage("assets/background_layer_4.png");
+  bgSkybackImg = loadImage("assets/background_layer_5.png");
+  bgYellowImg = loadImage("assets/background_layer_6.png");
+  bgMountainImg = loadImage("assets/background_layer_7.png");
 
   groundTileImg = loadImage("assets/groundTile.png");
   groundTileDeepImg = loadImage("assets/groundTileDeep.png");
@@ -229,12 +239,12 @@ function preload() {
 
   fontImg = loadImage("assets/bitmapFont.png");
 
- jump = loadSound("./assets/sfx/jump.wav");
-leafCollect = loadSound("./assets/sfx/leafCollect.wav");
-hitEnemy = loadSound("./assets/sfx/hitEnemy.wav");
-receiveDamage = loadSound("./assets/sfx/receiveDamage.wav");
-swing = loadSound("./assets/sfx/swing.mp3");
-music = loadSound("./assets/sfx/music.wav");
+  jump = loadSound("./assets/sfx/jump.wav");
+  leafCollect = loadSound("./assets/sfx/leafCollect.wav");
+  hitEnemy = loadSound("./assets/sfx/hitEnemy.wav");
+  receiveDamage = loadSound("./assets/sfx/receiveDamage.wav");
+  swing = loadSound("./assets/sfx/swing.mp3");
+  music = loadSound("./assets/sfx/music.wav");
 }
 
 function setup() {
@@ -470,6 +480,11 @@ function draw() {
   player.y = Math.round(player.y);
   sensor.x = Math.round(sensor.x);
   sensor.y = Math.round(sensor.y);
+
+  for (const s of leaf) {
+    if (!s.baseY) s.baseY = s.y;
+    s.y = s.baseY + Math.sin(frameCount * 0.08 + s.x) * 3;
+  }
 
   // hurt blink
   if (!dead && invulnTimer > 0) {
@@ -1197,12 +1212,12 @@ function makeWorld() {
   // --- INTERACTIVES ---
   leaf = new Group();
   leaf.physics = "static";
-  leaf.spriteSheet = leafImg;
-  leaf.addAnis({ idle: { w: 32, h: 32, row: 0, frames: 5 } });
-  leaf.w = 10;
-  leaf.h = 6;
-  leaf.anis.offset.x = 2;
-  leaf.anis.offset.y = -4;
+  leaf.img = leafImg;
+  leaf.scale = 0.8;
+
+  leaf.w = 14;
+  leaf.h = 14;
+
   leaf.tile = "x";
 
   fire = new Group();
@@ -1261,7 +1276,7 @@ function makeWorld() {
 
   player.ani = "idle";
   player.w = 18;
-  player.h = 12;
+  player.h = 10;
   player.friction = 0;
   player.bounciness = 0;
 
@@ -1336,6 +1351,10 @@ function makeWorld() {
     { img: bgFarImg, speed: 0.2 },
     { img: bgMidImg, speed: 0.4 },
     { img: bgForeImg, speed: 0.6 },
+    { img: bgSkyImg, speed: 0.2 },
+    { img: bgSkybackImg, speed: 0.1 },
+    { img: bgYellowImg, speed: 0.3 },
+    { img: bgMountainImg, speed: 0.1 },
   ];
 }
 
