@@ -134,7 +134,7 @@ let level = [
   " LgR      b                         LggR", // row  8
   "         LgR        x       LR  LgR     ", // row  9
   "   x     [d]       LggR            [dd]", // row 10
-  "LgggRLggggggR      Lgggg]      Lgggggggg", // row 11, large ground platforms
+  "LgggRLggggggR      Lgggg] dd     Lgggggggg", // row 11, large ground platforms
   "dddddddddddddddddddddddddddddddddddddddd", // row 12, solid ground
 ];
 

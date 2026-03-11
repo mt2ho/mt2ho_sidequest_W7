@@ -14,7 +14,7 @@ Changes made by Lisa; original by Karen Cochrane and David Han
 
 This goal of this sidequest is to add physics/motion to the player or audio, or combining both of them to create a multi-sensory effect. The objective of the game is to collect all the leaves, avoid, obstacles, and attack the boars. This code loaded the sound effects for jumping, attacking, recieving damage and music. It also includes a trail effect behind the fox when it moves to create a motion effect.
 
----
+---csdcd
 
 ## Learning Goals
 
