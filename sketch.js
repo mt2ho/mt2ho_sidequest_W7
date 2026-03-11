@@ -32,7 +32,7 @@ let trailTimer = 0;
 
 // --- SOUND EFFECTS ---
 let jump;
-let leafCollect;
+let candyCollect;
 let hitEnemy;
 let receiveDamage;
 let swing;
@@ -86,9 +86,9 @@ let bgForeImg,
   bgYellowImg,
   bgMountainImg;
 
-let leaf;
-let leafImg;
-let leafSpawns = [];
+let candy;
+let candyImg;
+let candySpawns = [];
 
 let fire;
 let fireImg;
@@ -219,7 +219,7 @@ function tileAtWorld(x, y) {
 function preload() {
   playerImg = loadImage("assets/catSpriteSheet.png");
   boarImg = loadImage("assets/monsterSpriteSheet.png");
-  leafImg = loadImage("assets/candySpriteSheet.png");
+  candyImg = loadImage("assets/candySpriteSheet.png");
   fireImg = loadImage("assets/fireSpriteSheet.png");
 
   bgFarImg = loadImage("assets/background_layer_1.png");
@@ -240,7 +240,7 @@ function preload() {
   fontImg = loadImage("assets/bitmapFont.png");
 
   jump = loadSound("./assets/sfx/jump.wav");
-  leafCollect = loadSound("./assets/sfx/leafCollect.wav");
+  candyCollect = loadSound("./assets/sfx/leafCollect.wav");
   hitEnemy = loadSound("./assets/sfx/hitEnemy.wav");
   receiveDamage = loadSound("./assets/sfx/receiveDamage.wav");
   swing = loadSound("./assets/sfx/swing.mp3");
@@ -267,11 +267,11 @@ function setup() {
   makeWorld();
 
   // Leaves should be overlap-only (boars pass through, player collects)
-  for (const s of leaf) s.removeColliders();
-  leafSpawns = [];
-  for (const s of leaf) {
+  for (const s of candy) s.removeColliders();
+  candySpawns = [];
+  for (const s of candy) {
     s.active = true;
-    leafSpawns.push({ s, x: s.x, y: s.y });
+    candySpawns.push({ s, x: s.x, y: s.y });
   }
 
   // store boar spawns for restart
@@ -481,7 +481,7 @@ function draw() {
   sensor.x = Math.round(sensor.x);
   sensor.y = Math.round(sensor.y);
 
-  for (const s of leaf) {
+  for (const s of candy) {
     if (!s.baseY) s.baseY = s.y;
     s.y = s.baseY + Math.sin(frameCount * 0.08 + s.x) * 3;
   }
@@ -626,13 +626,13 @@ function isPlayerGrounded() {
 }
 
 // --- LEAF COLLECT ---
-function rescueLeaf(player, leaf) {
-  if (!leaf.active) return;
-  leaf.active = false;
-  leaf.visible = false;
-  leaf.removeColliders();
+function rescueCandy(player, candy) {
+  if (!candy.active) return;
+  candy.active = false;
+  candy.visible = false;
+  candy.removeColliders();
   score++;
-  if (leafCollect) leafCollect.play();
+  if (candyCollect) candyCollect.play();
   // win condition
   if (score >= WIN_SCORE) {
     won = true;
@@ -1054,7 +1054,7 @@ function updateBoars() {
     const noGroundAhead = !frontProbeHasGroundAhead(e);
 
     // 2) turn if front probe hits leaf or fire
-    const frontHitsLeaf = e.frontProbe.overlapping(leaf);
+    const frontHitsCandy = e.frontProbe.overlapping(candy);
     const frontHitsFire = e.frontProbe.overlapping(fire);
     const frontHitsWall = frontProbeHitsWall(e);
 
@@ -1063,7 +1063,7 @@ function updateBoars() {
 
     const dangerNow =
       noGroundAhead ||
-      frontHitsLeaf ||
+      frontHitsCandy ||
       frontHitsFire ||
       frontHitsWall ||
       headSeesFire;
@@ -1113,8 +1113,8 @@ function restartGame() {
   camera.x = undefined;
   camera.y = undefined;
 
-  // respawn leaves
-  for (const item of leafSpawns) {
+  // respawn candies
+  for (const item of candySpawns) {
     const s = item.s;
     s.x = item.x;
     s.y = item.y;
@@ -1210,15 +1210,15 @@ function makeWorld() {
   boar.tile = "b";
 
   // --- INTERACTIVES ---
-  leaf = new Group();
-  leaf.physics = "static";
-  leaf.img = leafImg;
-  leaf.scale = 0.8;
+  candy = new Group();
+  candy.physics = "static";
+  candy.img = candyImg;
+  candy.scale = 0.8;
 
-  leaf.w = 14;
-  leaf.h = 14;
+  candy.w = 14;
+  candy.h = 14;
 
-  leaf.tile = "x";
+  candy.tile = "x";
 
   fire = new Group();
   fire.physics = "static";
@@ -1282,7 +1282,7 @@ function makeWorld() {
 
   // player interactions
   player.overlaps(fire, takeDamageFromFire);
-  player.overlaps(leaf, rescueLeaf);
+  player.overlaps(candy, rescueCandy);
   player.collides(boar, playerHitByBoar);
 
   // --- GROUND SENSOR (query-only) ---
